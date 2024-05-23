@@ -105,9 +105,11 @@ The main objective of this project is to compare different architectures and the
 
 \section{Data}
 
-\subsection{Original data}
+\subsection{Original Data}
 
-The data used in this project is the entire book of \textbf{Alice in Wonderland} written by Lewis Carroll. We get this book from the Gutenberg project. It contains about \textbf{TODO} words and has been splitted into \textbf{TODO} training/validation/text set.
+The data used in this project is the entire text of \textbf{Alice's Adventures in Wonderland} by Lewis Carroll, obtained from the Gutenberg Project. This book contains approximately \textbf{TODO} words. For our experiments, the text was divided into \textbf{TODO} training, validation, and test sets.
+
+The preprocessing steps were minimal, focusing primarily on splitting the raw corpus into individual characters, as our initial experiments were conducted at the character level. We created a dictionary to map each character to a unique integer, facilitating the conversion of text into a numerical format suitable for model training. This approach allowed us to capture fine-grained details of the text generation process, though it required careful handling of character sequences to maintain coherence in the generated text.
 
 \subsection{Data augmentation}
 
@@ -121,19 +123,86 @@ We base our work on the \textbf{PyTorch} llibrary to efficiently train our model
 
 \subsection{Training the networks}
 
-\textbf{TODO}
+\textbf{TO DELETE ??}
 
-At first we wanted to start from a the most simple basis to be able to compare improvements with other architectures. That's why we implement a simple RNN with ADAM optimizer.
+At first we wanted to start from a the most simple basis to be able to compare improvements with other architectures. That's why we implement a simple RNN with ADAM optimizer and a simple embedding layer. We wanted also to generate text from characters that's why we used as input characters and not words.
 
-\textbf{TO COMPLETE}
+\subsection{Generating sequences} 
 
-\subsection{Evalutation metrics}
+Several methods are available to generate sequences using Recurrent Neural Networks (RNNs). We experimented with three of them:
+
+\textbf{Deterministic sampling} involves picking the word with the highest probability at each step. This approach produces the most predictable and coherent text, which is especially useful for tasks requiring high reliability. Additionally, it is straightforward to implement and understand. However, it often results in repetitive and monotonous text, as it tends to overuse common phrases and words, leading to less creative outputs.
+
+\textbf{Temperature sampling} scales the probabilities with a temperature factor before sampling from the new distribution. A temperature value below 1 leads to more predictable generations, while a value above 1 results in less predictable, more diverse, but potentially less grammatically correct outputs. This method allows fine-tuning of the randomness in text generation, enabling a balance between coherence and diversity. Its versatility makes it suitable for different types of content, from highly structured to more creative texts. On the downside, finding the optimal temperature can be challenging and may require extensive experimentation. Additionally, high temperatures can lead to nonsensical or grammatically incorrect sentences.
+
+\textbf{Nucleus sampling} (also known as top-p sampling) defines a threshold \(p\) and only keeps the smallest set of words whose cumulative probability is above this threshold. Words are then sampled from this truncated distribution. This method strikes a balance between determinism and randomness, often resulting in coherent yet diverse text. By eliminating unlikely and potentially irrelevant words, it improves the overall quality of the text. However, it is more complex to implement compared to deterministic sampling, and the choice of threshold \(p\) can significantly impact the output, requiring careful fine-tuning.
+
+Each method has its own advantages and trade-offs, making them suitable for different types of text generation tasks. Deterministic sampling is ideal for scenarios requiring high reliability and consistency, temperature sampling offers flexibility in creativity, and nucleus sampling provides a good balance between the two.
+
+
+\subsection{Evaluation Metrics}
+
+To evaluate the performance of our text generation models, we used several metrics:
+
+\textbf{Loss:} We primarily monitored cross-entropy loss during training, which measures the difference between the predicted and actual word distributions. Lower loss indicates better model predictions.
+
+\textbf{Type-Token Ratio (TTR):} This metric measures lexical diversity by calculating the ratio of unique words (types) to total words (tokens) in the generated text. A higher TTR indicates more diverse vocabulary.
+
+\textbf{Percentage of Correctly Spelled Words:} This metric evaluates the spelling accuracy of the generated text by comparing each word to a standard dictionary, providing a percentage of correctly spelled words.
+
+\textbf{Perplexity:} Perplexity assesses how well the model predicts a word sequence, with lower values indicating better performance. It is the exponentiated average negative log-likelihood of the predicted word sequence.
+
+\textbf{BLEU Score:} The BLEU score evaluates the quality of generated text by comparing it to reference texts, measuring the precision of matching n-grams. Higher BLEU scores indicate better alignment with human-written text.
+
+Using these metrics, we ensured a comprehensive evaluation of both the training process and the quality of the generated text.
+
 
 \textbf{TODO}
 
 \section{Experiments}
 
+In our experiments, we systematically evaluated various aspects of our text generation models. The primary focus was on comparing different architectures, hyperparameters, and regularization techniques to optimize performance. The experiments were structured as follows:
+
+\subsection{Model Architecture Comparison}
+
+We began by comparing the performance of Recurrent Neural Networks (RNNs) and Long Short-Term Memory (LSTM) networks. Both architectures were tested with one and two layers to understand the impact of model depth on text generation quality. The comparison aimed to determine whether the additional complexity of LSTMs provided significant improvements over standard RNNs and how model depth influenced performance.
+
+\subsection{Hidden Nodes Analysis}
+
+Next, we conducted a study on the impact of the number of hidden nodes in the network. Various configurations were tested to identify the optimal size of the hidden layer. This analysis was crucial in balancing the trade-off between model complexity and computational efficiency.
+
+\subsection{Hyperparameter Tuning}
+
+We then explored how different learning rates and batch sizes affected the learning process. By systematically varying these hyperparameters, we aimed to find the optimal settings that would lead to faster convergence and better overall performance. The learning rate controls the step size during gradient descent, while the batch size determines the number of samples processed before updating the model parameters.
+
+\subsection{Regularization Techniques}
+
+To address overfitting, we experimented with several regularization techniques. Dropout was applied to randomly set a fraction of input units to zero at each update during training, which helps prevent the network from becoming too specialized to the training data. Additionally, layer normalization was implemented to normalize the inputs of each layer, stabilizing the learning process and improving model generalization.
+
+\subsection{Data Augmentation}
+
+Finally, we explored data augmentation methods to increase the diversity of our training data. This involved generating additional training samples by applying various transformations to the original data, which aimed to improve the model's robustness and its ability to generalize to unseen data.
+
+Each of these experiments provided valuable insights into the factors influencing the performance of our text generation models. The results guided us in selecting the best model configuration and training strategies for optimal text generation.
+
+
+
+
 \textbf{TODO}
+
+\section{Results}
+
+The firsts model were really not interesting and we obtain almost random generation (however, some words were understandable even though that was a simplle RNN based on char representation) like that:
+\begin{verbatim}
+Alice you, yot e, and the n all, S rs. Houcl, int you, ife        of thilled them!ns lillillis
+mbis lyou, 'Why en and ang,' and Alich yealligi, th af
+mers the med Alichem I tou Hic you armnerie youglaidow yriericemealongNlm every wille, you, and the hrick, you, allown and youadveen ilillembell fong th you, ifutilleem ed solllow!' mear ther shng Mer and QWr ace,' th?lllairie
+'it,it,' Ilar ter her wou, inl,' h
+mem doingn it thise you, thing I rig
+ er ma, as wast ulilled nchilled headved Iled Alring!' A
+\end{verbatim}
+
+\textbf{TO COMPLETE}
 
 \section{Conclusion}
 
