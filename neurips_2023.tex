@@ -101,7 +101,7 @@
   % spacing (leading) of 11~points.  The word \textbf{Abstract} must be centered,
   % bold, and in point size 12. Two line spaces precede the abstract. The abstract
   % must be limited to one paragraph.
-  This project concerns the generation of Lewis Carroll-like sentences using different architectures of neural networks (RNN, LSTM, GRU, Transformers). Additionally, we evaluate the results both quantitatively and qualitatively, employing various methods to improve these results. The methods used involve optimizing the hyper-parameters of the networks as well as modifying the input data (such as data augmentation and embedding techniques).
+  This project concerns the generation of Lewis Carroll-like sentences using different architectures of neural networks (RNN, LSTM, Transformers). Additionally, we evaluate the results both quantitatively and qualitatively, employing various methods to improve these results. The methods used involve optimizing the hyper-parameters of the networks as well as modifying the input data (such as data augmentation and embedding techniques).
 \end{abstract}
 
 \section{Introduction}
@@ -110,9 +110,10 @@ The problem we aim to address is natural language generation, commonly used for 
 
 The main objective of this project is to compare different architectures and their effectiveness in generating coherent text. Additionally, we evaluate overall performance metrics, such as inference time and training time. We will optimize the results of the architectures through hyper-parameters tuning and employ data augmentation to achieve better generalization.
 
-\section{Related work}
+\section{Related Work}
+Research in natural language generation has advanced with various neural network architectures \cite{nlpprogress}. Recurrent Neural Networks (RNNs) have been foundational but suffer from limitations like vanishing gradients. Long Short-Term Memory (LSTM) networks address these issues with memory cells and gating mechanisms, handling long-term dependencies better. More recently, Transformer architectures enable parallel processing of text, leading to superior performance and efficiency in generating coherent sentences \cite{grulstm}.
 
-Research in natural language generation has advanced significantly with various neural network architectures. Recurrent Neural Networks have been foundational but suffer from limitations like vanishing gradients. Long Short-Term Memory networks address these issues with memory cells and gating mechanisms, that makes it able to handle long-term dependencies. More recently, Transformer architectures allowed parallel processing of text, leading to better performance and efficiency in generating coherent and contextually relevant sentences. 
+
 
 \section{Data}
 
@@ -163,7 +164,7 @@ To evaluate the performance of our text generation models, we used several metri
 
 \textbf{Perplexity:} Perplexity assesses how well the model predicts a word sequence, with lower values indicating better performance. It is the exponentiated average negative log-likelihood of the predicted word sequence.
 
-\textbf{BLEU Score:} The BLEU score evaluates the quality of generated text by comparing it to reference texts, measuring the precision of matching n-grams. Higher BLEU scores indicate better alignment with human-written text.
+\textbf{BLEU Score:} The BLEU score \cite{10.3115/1073083.1073135} evaluates the quality of generated text by comparing it to reference texts, measuring the precision of matching n-grams. Higher BLEU scores indicate better alignment with human-written text.
 
 Using these metrics, we ensured a comprehensive evaluation of both the training process and the quality of the generated text.
 
@@ -176,7 +177,7 @@ In our experiments, we systematically evaluated various aspects of our text gene
 
 As described earlier, there are several methods to generate texts and we compared them. 
 
-This study was performed on our best model, consisting of a 2-layer LSTM with a 100-dimensional embedding, a context of 200 characters, 512 hidden nodes per layer, a dropout of 0.3 and layer normalization applied between the LSTM and fully connected layer.
+This study was performed on our best model, consisting of a 2-layer LSTM with a 100-dimensional embedding, a context of 200 characters, 512 hidden nodes per layer, a dropout of 0.4 and layer normalization applied between the LSTM and fully connected layer.
 
 Figure \ref{fig:text_generation} shows the different metrics, compared to a reference text.
 We see that the deterministic method has the lowest TTR, this is due to the fact that it often falls into a repetition loop. Temperature and nucleus clearly outperforms the deterministic method, and we also see a slight improvement when adding nucleus sampling over the temperature, with perplexity going a bit down, approaching the reference text.   
@@ -247,16 +248,23 @@ Even though the results are very good for a human, according to our metrics (fig
 
 Finally, we explored data augmentation methods to increase the diversity of our training data. This involved generating additional training samples by applying various transformations to the original data, which aimed to improve the model's robustness and its ability to generalize to unseen data.
 
-We tried to use data augmentation on different model from a simple RNN model, we can understand that it increase the loss from 5.66 to 5.87. But when we analyse the synthesized text qualitatively, a few things have changed:
-\begin{itemize}
-    \item the model is able to create correct sentences
-    \item the model is less repetitive 
-    \item the model is less representative of the book
-\end{itemize}
-We will also next implement it on all our best models. 
-We can understand that in every case the loss is higher, as we augment the dataset we are using words that have the same meaning (roughly) but that would not be used by the author so it makes the result more accurate in general but less accurate when we think about writing as the author of the dataset.
 
-To have better results using data augmentation it could be interesting to implement contextualized word embedding \cite{wordrep}.
+% We tried to use data augmentation on different model from a simple RNN model, we can understand that it increase the loss from 5.66 to 5.87. But when we analyse the synthesized text qualitatively, a few things have changed:
+% \begin{itemize}
+%     \item the model is able to create correct sentences
+%     \item the model is less repetitive 
+%     \item the model is less representative of the book
+% \end{itemize}
+% We will also next implement it on all our best models. 
+% We can understand that in every case the loss is higher, as we augment the dataset we are using words that have the same meaning (roughly) but that would not be used by the author so it makes the result more accurate in general but less accurate when we think about writing as the author of the dataset.
+
+We trained a network with the same parameters as our best model on an augmented dataset.
+
+While the training loss was slightly higher, we observed benefits in text generation. As shown in Figure \ref{fig:text_augmentation}, the Type-Token Ratio (TTR) score decreased, indicating reduced diversity. However, we achieved higher spelling accuracy and an improved BLEU score.
+
+The higher loss can be attributed to the use of augmented data, where words with similar meanings are used but may not align with the author's original style. This leads to more general accuracy but less fidelity to the author's writing style.
+
+To further improve results with data augmentation, implementing contextualized word embeddings could be beneficial.\cite{wordrep}
 
 
 
@@ -282,9 +290,6 @@ The Mock Turtle sighed deeply, and the long grass rustled at her arm, and walked
 'They lived on saying "Come up, and make your face, and the poor little thing!' said the Queen.
 'It isn't mad.'
 'It's the jury-box,' said Alice.
-'Come on!' cried the Gryphon, and the Queen was sitting nearer to say 'What a curious dream!' said the Queen.
-'Well, it's a good many little pebbles care, and was sitting on the chimney, and said to the Queen, so that they were getting so sudden change, and the moment Alice was thoroughly puzzled in reply.
-
 \end{lstlisting}
 
 And at the very end, the transformer based model output that:
@@ -292,11 +297,10 @@ And at the very end, the transformer based model output that:
 Alice was a good deal worse off than before, as the March Hare had just upset the milk-jug into his plate. Alice did not wish to offend the Dormouse again, so she began very cautiously: 'But I don't understand. Where did they draw the treacle from?' 'You can draw water out of a water-well,' said the Hatter; 'so I should think you could draw treacle out of a treacle-well--eh, stupid?' 'But they were IN the well,' Alice said to the Dormouse, not choosing to notice this last remark. 'Of course they were', said the Dormouse; '--well in.' This answer so confused poor Alice,
 \end{lstlisting}
 
-\textbf{TO COMPLETE}
-
 \section{Conclusion}
 
-\textbf{TODO}
+In this paper, we implemented and compared multiple architectures. We evaluated their performance by analyzing loss, training time, and various metrics designed to assess the quality and accuracy of the generated text. Additionally, we applied data augmentation techniques to enhance the generalizability of our results. Ultimately, our findings indicate that both a well-optimized LSTM and a transformer model yield exceptional outcomes, closely resembling human-generated text.
+
 
 \newpage
 
@@ -304,7 +308,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
 
 \newpage
 
-\section*{Appendix: Experiment 1}
+\section*{Appendix: Experiment 1 Text generation methods}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{figures/text_generation.png}
@@ -312,7 +316,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
     \label{fig:text_generation}
 \end{figure}
 
-\section*{Appendix: Experiment 2}
+\section*{Appendix: Experiment 2 RNN vs LSTM}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/RNN_LSTM_comparison.png}
@@ -327,7 +331,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
     \label{fig:text_rnn_lstm}
 \end{figure}
 
-\section*{Appendix: Experiment 3}
+\section*{Appendix: Experiment 3 Number of hidden nodes}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/LSTM_hidden_sizes.png}
@@ -342,7 +346,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
     \label{fig:text_hidden}
 \end{figure}
 
-\section*{Appendix: Experiment 4}
+\section*{Appendix: Experiment 4 Batch Size influence}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/LSTM_batch_size.png}
@@ -358,7 +362,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
 \end{figure}
 
 
-\section*{Appendix: Experiment 5}
+\section*{Appendix: Experiment 5 Regularization with Dropout}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/LSTM_dropout.png}
@@ -373,7 +377,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
     \label{fig:text_dropout}
 \end{figure}
 
-\section*{Appendix: Experiment 6}
+\section*{Appendix: Experiment 6 Number of Layers}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/LSTM_nb_layers.png}
@@ -388,7 +392,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
     \label{fig:text_nb_layers}
 \end{figure}
 
-\section*{Appendix: Experiment 7}
+\section*{Appendix: Experiment 7 Transformer Network}
 
 \begin{figure}[H]
     \centering
@@ -397,7 +401,7 @@ Alice was a good deal worse off than before, as the March Hare had just upset th
     \label{fig:text_transformer}
 \end{figure}
 
-\section*{Appendix: Experiment 8}
+\section*{Appendix: Experiment 8 Data Augmentation}
 % \section{Appendix A: Data augmentation example and graphs}
 
 Here is a short example of the substitution that have been made to augment the dataset.
@@ -414,373 +418,16 @@ Example 2 of substitution:
     \item Reformulated twice: more looked at it 
 \end{itemize}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/text_augmented.png}
+    \caption{Comparison of text generation: LSTM vs LSTM with Data Augmentation}
+    \label{fig:text_augmentation}
+\end{figure}
+
 And here is what a text generation looks like:
 \begin{lstlisting}[breaklines]
     alice was all three sides of the house of her and the three gardeners who was the caterpillar took the cook to the thing before she had never doesnt think to alice some called with cat in the way to the baby with a sigh his took nearer in the distance and the party were off if something came with one paw to the mock turtle in the distance but it made me to fancy what the gryphon said was shouted out that she stood well one of the end of its shoes of mouse in silence was a rabbit was over in more little shriek and stupidly until she could not think of an office of the fire and the first same side of the trees had a sort of all the caterpillar and the rabbit was so she did so she began in the air - - what time it to be tried at the confusion that she set off at the mouse began went on of what dark said the pigeon but she sat down again so in the sea so she went on looking at the baby with one eyes and the things growing and said to herself but alice tried to stay down here which he was so suddenly 
 
 \end{lstlisting}
-
-\newpage
-
-
-\section{Submission of papers to NeurIPS 2023}
-
-Please read the instructions below carefully and follow them faithfully. \textbf{Important:} This year the checklist will be submitted separately from the main paper in OpenReview, please review it well ahead of the submission deadline: \url{https://neurips.cc/public/guides/PaperChecklist}.
-
-
-\subsection{Style}
-
-
-Papers to be submitted to NeurIPS 2023 must be prepared according to the
-instructions presented here. Papers may only be up to {\bf nine} pages long,
-including figures. Additional pages \emph{containing only acknowledgments and
-references} are allowed. Papers that exceed the page limit will not be
-reviewed, or in any other way considered for presentation at the conference.
-
-
-The margins in 2023 are the same as those in previous years.
-
-
-Authors are required to use the NeurIPS \LaTeX{} style files obtainable at the
-NeurIPS website as indicated below. Please make sure you use the current files
-and not previous versions. Tweaking the style files may be grounds for
-rejection.
-
-
-\subsection{Retrieval of style files}
-
-
-The style files for NeurIPS and other conference information are available on
-the website at
-\begin{center}
-  \url{http://www.neurips.cc/}
-\end{center}
-The file \verb+neurips_2023.pdf+ contains these instructions and illustrates the
-various formatting requirements your NeurIPS paper must satisfy.
-
-
-The only supported style file for NeurIPS 2023 is \verb+neurips_2023.sty+,
-rewritten for \LaTeXe{}.  \textbf{Previous style files for \LaTeX{} 2.09,
-  Microsoft Word, and RTF are no longer supported!}
-
-
-The \LaTeX{} style file contains three optional arguments: \verb+final+, which
-creates a camera-ready copy, \verb+preprint+, which creates a preprint for
-submission to, e.g., arXiv, and \verb+nonatbib+, which will not load the
-\verb+natbib+ package for you in case of package clash.
-
-
-\paragraph{Preprint option}
-If you wish to post a preprint of your work online, e.g., on arXiv, using the
-NeurIPS style, please use the \verb+preprint+ option. This will create a
-nonanonymized version of your work with the text ``Preprint. Work in progress.''
-in the footer. This version may be distributed as you see fit, as long as you do not say which conference it was submitted to. Please \textbf{do
-  not} use the \verb+final+ option, which should \textbf{only} be used for
-papers accepted to NeurIPS. 
-
-
-At submission time, please omit the \verb+final+ and \verb+preprint+
-options. This will anonymize your submission and add line numbers to aid
-review. Please do \emph{not} refer to these line numbers in your paper as they
-will be removed during generation of camera-ready copies.
-
-
-The file \verb+neurips_2023.tex+ may be used as a ``shell'' for writing your
-paper. All you have to do is replace the author, title, abstract, and text of
-the paper with your own.
-
-
-The formatting instructions contained in these style files are summarized in
-Sections \ref{gen_inst}, \ref{headings}, and \ref{others} below.
-
-
-\section{General formatting instructions}
-\label{gen_inst}
-
-
-The text must be confined within a rectangle 5.5~inches (33~picas) wide and
-9~inches (54~picas) long. The left margin is 1.5~inch (9~picas).  Use 10~point
-type with a vertical spacing (leading) of 11~points.  Times New Roman is the
-preferred typeface throughout, and will be selected for you by default.
-Paragraphs are separated by \nicefrac{1}{2}~line space (5.5 points), with no
-indentation.
-
-
-The paper title should be 17~point, initial caps/lower case, bold, centered
-between two horizontal rules. The top rule should be 4~points thick and the
-bottom rule should be 1~point thick. Allow \nicefrac{1}{4}~inch space above and
-below the title to rules. All pages should start at 1~inch (6~picas) from the
-top of the page.
-
-
-For the final version, authors' names are set in boldface, and each name is
-centered above the corresponding address. The lead author's name is to be listed
-first (left-most), and the co-authors' names (if different address) are set to
-follow. If there is only one co-author, list both author and co-author side by
-side.
-
-
-Please pay special attention to the instructions in Section \ref{others}
-regarding figures, tables, acknowledgments, and references.
-
-
-\section{Headings: first level}
-\label{headings}
-
-
-All headings should be lower case (except for first word and proper nouns),
-flush left, and bold.
-
-
-First-level headings should be in 12-point type.
-
-
-\subsection{Headings: second level}
-
-
-Second-level headings should be in 10-point type.
-
-
-\subsubsection{Headings: third level}
-
-
-Third-level headings should be in 10-point type.
-
-
-\paragraph{Paragraphs}
-
-
-There is also a \verb+\paragraph+ command available, which sets the heading in
-bold, flush left, and inline with the text, with the heading followed by 1\,em
-of space.
-
-
-\section{Citations, figures, tables, references}
-\label{others}
-
-
-These instructions apply to everyone.
-
-
-\subsection{Citations within the text}
-
-
-The \verb+natbib+ package will be loaded for you by default.  Citations may be
-author/year or numeric, as long as you maintain internal consistency.  As to the
-format of the references themselves, any style is acceptable as long as it is
-used consistently.
-
-
-The documentation for \verb+natbib+ may be found at
-\begin{center}
-  \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-\end{center}
-Of note is the command \verb+\citet+, which produces citations appropriate for
-use in inline text.  For example,
-\begin{verbatim}
-   \citet{hasselmo} investigated\dots
-\end{verbatim}
-produces
-\begin{quote}
-  Hasselmo, et al.\ (1995) investigated\dots
-\end{quote}
-
-
-If you wish to load the \verb+natbib+ package with options, you may add the
-following before loading the \verb+neurips_2023+ package:
-\begin{verbatim}
-   \PassOptionsToPackage{options}{natbib}
-\end{verbatim}
-
-
-If \verb+natbib+ clashes with another package you load, you can add the optional
-argument \verb+nonatbib+ when loading the style file:
-\begin{verbatim}
-   \usepackage[nonatbib]{neurips_2023}
-\end{verbatim}
-
-
-As submission is double blind, refer to your own published work in the third
-person. That is, use ``In the previous work of Jones et al.\ [4],'' not ``In our
-previous work [4].'' If you cite your other papers that are not widely available
-(e.g., a journal paper under review), use anonymous author names in the
-citation, e.g., an author of the form ``A.\ Anonymous'' and include a copy of the anonymized paper in the supplementary material.
-
-
-\subsection{Footnotes}
-
-
-Footnotes should be used sparingly.  If you do require a footnote, indicate
-footnotes with a number\footnote{Sample of the first footnote.} in the
-text. Place the footnotes at the bottom of the page on which they appear.
-Precede the footnote with a horizontal rule of 2~inches (12~picas).
-
-
-Note that footnotes are properly typeset \emph{after} punctuation
-marks.\footnote{As in this example.}
-
-
-\subsection{Figures}
-
-
-\begin{figure}
-  \centering
-  \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-  \caption{Sample figure caption.}
-\end{figure}
-
-
-All artwork must be neat, clean, and legible. Lines should be dark enough for
-purposes of reproduction. The figure number and caption always appear after the
-figure. Place one line space before the figure caption and one line space after
-the figure. The figure caption should be lower case (except for first word and
-proper nouns); figures are numbered consecutively.
-
-
-You may use color figures.  However, it is best for the figure captions and the
-paper body to be legible if the paper is printed in either black/white or in
-color.
-
-
-\subsection{Tables}
-
-
-All tables must be centered, neat, clean and legible.  The table number and
-title always appear before the table.  See Table~\ref{sample-table}.
-
-
-Place one line space before the table title, one line space after the
-table title, and one line space after the table. The table title must
-be lower case (except for first word and proper nouns); tables are
-numbered consecutively.
-
-
-Note that publication-quality tables \emph{do not contain vertical rules.} We
-strongly suggest the use of the \verb+booktabs+ package, which allows for
-typesetting high-quality, professional tables:
-\begin{center}
-  \url{https://www.ctan.org/pkg/booktabs}
-\end{center}
-This package was used to typeset Table~\ref{sample-table}.
-
-
-\begin{table}
-  \caption{Sample table title}
-  \label{sample-table}
-  \centering
-  \begin{tabular}{lll}
-    \toprule
-    \multicolumn{2}{c}{Part}                   \\
-    \cmidrule(r){1-2}
-    Name     & Description     & Size ($\mu$m) \\
-    \midrule
-    Dendrite & Input terminal  & $\sim$100     \\
-    Axon     & Output terminal & $\sim$10      \\
-    Soma     & Cell body       & up to $10^6$  \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\subsection{Math}
-Note that display math in bare TeX commands will not create correct line numbers for submission. Please use LaTeX (or AMSTeX) commands for unnumbered display math. (You really shouldn't be using \$\$ anyway; see \url{https://tex.stackexchange.com/questions/503/why-is-preferable-to} and \url{https://tex.stackexchange.com/questions/40492/what-are-the-differences-between-align-equation-and-displaymath} for more information.)
-
-\subsection{Final instructions}
-
-Do not change any aspects of the formatting parameters in the style files.  In
-particular, do not modify the width or length of the rectangle the text should
-fit into, and do not change font sizes (except perhaps in the
-\textbf{References} section; see below). Please note that pages should be
-numbered.
-
-
-\section{Preparing PDF files}
-
-
-Please prepare submission files with paper size ``US Letter,'' and not, for
-example, ``A4.''
-
-
-Fonts were the main cause of problems in the past years. Your PDF file must only
-contain Type 1 or Embedded TrueType fonts. Here are a few instructions to
-achieve this.
-
-
-\begin{itemize}
-
-
-\item You should directly generate PDF files using \verb+pdflatex+.
-
-
-\item You can check which fonts a PDF files uses.  In Acrobat Reader, select the
-  menu Files$>$Document Properties$>$Fonts and select Show All Fonts. You can
-  also use the program \verb+pdffonts+ which comes with \verb+xpdf+ and is
-  available out-of-the-box on most Linux machines.
-
-
-\item \verb+xfig+ "patterned" shapes are implemented with bitmap fonts.  Use
-  "solid" shapes instead.
-
-
-\item The \verb+\bbold+ package almost always uses bitmap fonts.  You should use
-  the equivalent AMS Fonts:
-\begin{verbatim}
-   \usepackage{amsfonts}
-\end{verbatim}
-followed by, e.g., \verb+\mathbb{R}+, \verb+\mathbb{N}+, or \verb+\mathbb{C}+
-for $\mathbb{R}$, $\mathbb{N}$ or $\mathbb{C}$.  You can also use the following
-workaround for reals, natural and complex:
-\begin{verbatim}
-   \newcommand{\RR}{I\!\!R} %real numbers
-   \newcommand{\Nat}{I\!\!N} %natural numbers
-   \newcommand{\CC}{I\!\!\!\!C} %complex numbers
-\end{verbatim}
-Note that \verb+amsfonts+ is automatically loaded by the \verb+amssymb+ package.
-
-
-\end{itemize}
-
-
-If your file contains type 3 fonts or non embedded TrueType fonts, we will ask
-you to fix it.
-
-
-\subsection{Margins in \LaTeX{}}
-
-
-Most of the margin problems come from figures positioned by hand using
-\verb+\special+ or other commands. We suggest using the command
-\verb+\includegraphics+ from the \verb+graphicx+ package. Always specify the
-figure width as a multiple of the line width as in the example below:
-\begin{verbatim}
-   \usepackage[pdftex]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]{myfile.pdf}
-\end{verbatim}
-See Section 4.4 in the graphics bundle documentation
-(\url{http://mirrors.ctan.org/macros/latex/required/graphics/grfguide.pdf})
-
-
-A number of width problems arise when \LaTeX{} cannot properly hyphenate a
-line. Please give LaTeX hyphenation hints using the \verb+\-+ command when
-necessary.
-
-
-\begin{ack}
-Use unnumbered first level headings for the acknowledgments. All acknowledgments
-go at the end of the paper before the list of references. Moreover, you are required to declare
-funding (financial activities supporting the submitted work) and competing interests (related financial activities outside the submitted work).
-More information about this disclosure can be found at: \url{https://neurips.cc/Conferences/2023/PaperInformation/FundingDisclosure}.
-
-
-Do {\bf not} include this section in the anonymized submission, only in the final paper. You can use the \texttt{ack} environment provided in the style file to autmoatically hide this section in the anonymized submission.
-\end{ack}
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 \end{document}
