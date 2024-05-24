@@ -32,6 +32,7 @@
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
 \usepackage{xcolor}         % colors
+\usepackage{listings}
 
 
 \title{DD2424 Project - Group 12 \\ Text Generation}
@@ -248,20 +249,20 @@ To have better results using data augmentation it could be interesting to implem
 
 \section{Results}
 
-The firsts model were really not interesting and we obtain almost random generation (however, some words were understandable even though that was a simplle RNN based on char representation) like that:
-\begin{verbatim}
+The firsts model were really not interesting and we obtain almost random generation (however, some words were understandable even though that was a simple RNN based on char representation) like that:
+\begin{lstlisting}[breaklines]
 Alice you, yot e, and the n all, S rs. Houcl, int you, ife        of thilled them!ns lillillis
 mbis lyou, 'Why en and ang,' and Alich yealligi, th af
 mers the med Alichem I tou Hic you armnerie youglaidow yriericemealongNlm every wille, you, and the hrick, you, allown and youadveen ilillembell fong th you, ifutilleem ed solllow!' mear ther shng Mer and QWr ace,' th?lllairie
 'it,it,' Ilar ter her wou, inl,' h
 mem doingn it thise you, thing I rig
  er ma, as wast ulilled nchilled headved Iled Alring!' A
-\end{verbatim}
+\end{lstlisting}
 
 and at the very end, one of our best model output that:
-\begin{verbatim}
-    
-\end{verbatim}
+\begin{lstlisting}[breaklines]
+    Alice was a good deal worse off than before, as the March Hare had just upset the milk-jug into his plate. Alice did not wish to offend the Dormouse again, so she began very cautiously: 'But I don't understand. Where did they draw the treacle from?' 'You can draw water out of a water-well,' said the Hatter; 'so I should think you could draw treacle out of a treacle-well--eh, stupid?' 'But they were IN the well,' Alice said to the Dormouse, not choosing to notice this last remark. 'Of course they were', said the Dormouse; '--well in.' This answer so confused poor Alice,
+\end{lstlisting}
 
 \textbf{TO COMPLETE}
 
