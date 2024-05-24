@@ -126,6 +126,7 @@ We base our work on the \textbf{PyTorch} library to efficiently train our models
 \subsection{Training the networks}
 
 Initially, we aimed to begin with the simplest foundation to facilitate comparisons with other architectures. For nearly all the networks, we utilized the Adam optimizer and an embedding layer. The Adam optimizer aids in determining the optimal learning rate throughout the training process, while the embedding layer provides a more effective representation of the inputs in a fixed dimension.
+For the training, we also used dropout and layer normalization to get a better training result with more generalization.
 
 \subsection{Generating sequences} 
 
@@ -214,8 +215,6 @@ In terms of text generation metrics, higher dropout values lead to lower TTR sco
 
 Thus, it is important to find a balance in dropout. For our best model in Experiment 1 (\ref{Generation study}), we selected a dropout value of 0.3 to balance these factors effectively.
 
-
-
 \subsection{Number of layers}
 
 We investigated whether increasing network depth improves performance by training 2, 3, and 4 layer networks.
@@ -229,6 +228,10 @@ While adding regularization techniques might improve the performance of deeper n
 
 % \subsection{Regularization Techniques}
 % Additionally, layer normalization was implemented to normalize the inputs of each layer, stabilizing the learning process and improving model generalization.
+
+\subsection{Transformer Network}
+
+We developed a transformer-based architecture comprising an encoder and decoder, utilizing multihead attention mechanisms. The resulting model consists of 2.5 million trainable parameters. In this implementation, we used words as tokens for the input rather than individual characters. This approach proved to be one of our most effective architectures for text generation.
 
 \subsection{Data Augmentation}
 
@@ -259,9 +262,9 @@ mem doingn it thise you, thing I rig
  er ma, as wast ulilled nchilled headved Iled Alring!' A
 \end{lstlisting}
 
-and at the very end, one of our best model output that:
+And at the very end, the transformer based model output that:
 \begin{lstlisting}[breaklines]
-    Alice was a good deal worse off than before, as the March Hare had just upset the milk-jug into his plate. Alice did not wish to offend the Dormouse again, so she began very cautiously: 'But I don't understand. Where did they draw the treacle from?' 'You can draw water out of a water-well,' said the Hatter; 'so I should think you could draw treacle out of a treacle-well--eh, stupid?' 'But they were IN the well,' Alice said to the Dormouse, not choosing to notice this last remark. 'Of course they were', said the Dormouse; '--well in.' This answer so confused poor Alice,
+Alice was a good deal worse off than before, as the March Hare had just upset the milk-jug into his plate. Alice did not wish to offend the Dormouse again, so she began very cautiously: 'But I don't understand. Where did they draw the treacle from?' 'You can draw water out of a water-well,' said the Hatter; 'so I should think you could draw treacle out of a treacle-well--eh, stupid?' 'But they were IN the well,' Alice said to the Dormouse, not choosing to notice this last remark. 'Of course they were', said the Dormouse; '--well in.' This answer so confused poor Alice,
 \end{lstlisting}
 
 \textbf{TO COMPLETE}
@@ -271,6 +274,8 @@ and at the very end, one of our best model output that:
 \textbf{TODO}
 
 \newpage
+
+\bibliography{ref}
 
 \section*{References}
 
@@ -295,6 +300,16 @@ Here you can find the following sources that we use for this project and this re
 }
 
 \newpage
+
+\section{Appendix: Experiment 1}
+\section{Appendix: Experiment 2}
+\section{Appendix: Experiment 3}
+\section{Appendix: Experiment 4}
+\section{Appendix: Experiment 5}
+\section{Appendix: Experiment 6}
+\section{Appendix: Experiment 7}
+\section{Appendix: Experiment 8}
+
 
 
 \section{Appendix A: Data augmentation example and graphs}
