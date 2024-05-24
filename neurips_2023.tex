@@ -107,25 +107,24 @@ The main objective of this project is to compare different architectures and the
 
 \subsection{Original Data}
 
-The data used in this project is the entire text of \textbf{Alice's Adventures in Wonderland} by Lewis Carroll, obtained from the Gutenberg Project. This book contains approximately \textbf{TODO} words. For our experiments, the text was divided into \textbf{TODO} training, validation, and test sets.
+The data used in this project is the entire text of \textbf{Alice's Adventures in Wonderland} by Lewis Carroll, obtained from the Gutenberg Project. This book contains approximately 26500 words. For our experiments, the text was divided into training, validation, and test sets. The validation test is composed of the second to last chapter and the test set is composed of the last chapter. The training set is the rest of the book.
 
 The preprocessing steps were minimal, focusing primarily on splitting the raw corpus into individual characters, as our initial experiments were conducted at the character level. We created a dictionary to map each character to a unique integer, facilitating the conversion of text into a numerical format suitable for model training. This approach allowed us to capture fine-grained details of the text generation process, though it required careful handling of character sequences to maintain coherence in the generated text.
 
 \subsection{Data augmentation}
 
-\textbf{TODO}
+As suggested in the guidance, we implemented data augmentation. We used the articles [1] [2] as a guidance to implement it. There are multiple type of data augmentation, such as: random insertion, random deletion, characters replacement, back translation, noise injection. In our situation we choose synonym replacement. This is relatively basic because it consists of replacing randomly some work in a sentence with a synonym. In the appendix A we can see some example of replacement. We choose to augment the text two times, concretely this means that we increase the number of unique words in the vocabulary from 3181 to 5628, that is a 77\%  increase. We could have increase more the number of reformulation but it takes a lot more time for a result that is not better. As we will see after, if we increase the number of reformulation we loose the author's ton. Moreover we need to remember that increasing the number of words, increase the time needed for training.
+
 
 \section{Libraries used}
 
-We base our work on the \textbf{PyTorch} llibrary to efficiently train our models on GPUs, saving time. For text processing, we used the \textbf{NLTK} library to retrieve and process the data, a crucial step in training models for text generation.
+We base our work on the \textbf{PyTorch} library to efficiently train our models on GPUs, saving time. For text processing, we used the \textbf{NLTK} library to retrieve and process the data, a crucial step in training models for text generation.
 
 \section{Methods}
 
 \subsection{Training the networks}
 
-\textbf{TO DELETE ??}
-
-At first we wanted to start from a the most simple basis to be able to compare improvements with other architectures. That's why we implement a simple RNN with ADAM optimizer and a simple embedding layer. We wanted also to generate text from characters that's why we used as input characters and not words.
+Initially, we aimed to begin with the simplest foundation to facilitate comparisons with other architectures. For nearly all the networks, we utilized the Adam optimizer and an embedding layer. The Adam optimizer aids in determining the optimal learning rate throughout the training process, while the embedding layer provides a more effective representation of the inputs in a fixed dimension.
 
 \subsection{Generating sequences} 
 
@@ -163,32 +162,89 @@ Using these metrics, we ensured a comprehensive evaluation of both the training 
 
 In our experiments, we systematically evaluated various aspects of our text generation models. The primary focus was on comparing different architectures, hyperparameters, and regularization techniques to optimize performance. The experiments were structured as follows:
 
+\subsection{Generation Process}\label{Generation study}
+
+As described earlier, there are several methods to generate texts and we compared them. 
+
+This study was performed on our best model, consisting of a 2-layer LSTM with a 100-dimensional embedding, a context of 200 characters, 512 hidden nodes per layer, a dropout of 0.3 and layer normalization applied between the LSTM and fully connected layer.
+
+Figure \ref{} shows the different metrics, compared to a reference text.
+We see that the deterministic method has the lowest TTR, this is due to the fact that it often falls into a repetition loop. Temperature and nucleus clearly outperforms the deterministic method, and we also see a slight improvement when adding nucleus sampling over the temperature, with perplexity going a bit down, approaching the reference text.   
+
+This is why we use the nucleus sampling method in the following experiment to assess the performance of text generation.
+
 \subsection{Model Architecture Comparison}
 
-We began by comparing the performance of Recurrent Neural Networks (RNNs) and Long Short-Term Memory (LSTM) networks. Both architectures were tested with one and two layers to understand the impact of model depth on text generation quality. The comparison aimed to determine whether the additional complexity of LSTMs provided significant improvements over standard RNNs and how model depth influenced performance.
+We compared the performance of RNN and LSTM networks with one and two layers to evaluate the impact of model complexity and depth on text generation.
+
+LSTM models consistently achieve lower training and validation losses compared to RNNs, indicating better learning and generalization. The two-layer LSTM converges faster and reaches a lower loss.
+
+In terms of text metrics, RNNs show higher TTR, suggesting more diverse vocabulary usage. However, LSTMs have higher perplexity, indicating less confident predictions. Despite this, LSTMs generate text with higher spelling accuracy and achieve higher BLEU scores, reflecting closer similarity to the reference text. The two-layer LSTM performs the best overall.
+
+In conclusion, while LSTMs exhibit higher perplexity, they outperform RNNs in terms of loss reduction, text coherence, and accuracy. The two-layer LSTM, in particular, demonstrates superior performance, making it the preferred model for text generation tasks in this comparison. 
 
 \subsection{Hidden Nodes Analysis}
 
-Next, we conducted a study on the impact of the number of hidden nodes in the network. Various configurations were tested to identify the optimal size of the hidden layer. This analysis was crucial in balancing the trade-off between model complexity and computational efficiency.
+We studied the impact of the number of hidden nodes in the network to balance model complexity and computational efficiency.
+
+Increasing the number of hidden nodes generally improves validation loss but also increases the risk of overfitting, as indicated by the rise in validation loss after several epochs. To mitigate this, regularization techniques are necessary. Additionally, training larger models is computationally intensive, necessitating careful consideration of resource constraints.
+
+In terms of text metrics, the TTR score increases with more hidden nodes, indicating more diverse vocabulary usage. Perplexity decreases with more hidden nodes, showing improved model confidence and coherence. Spelling accuracy is highest for the 128-node model, suggesting better vocabulary learning. The BLEU score is relatively high across all models, with smaller models achieving the highest scores.
+
+In conclusion, while increasing hidden nodes can enhance performance, it requires regularization to prevent overfitting and involves higher computational costs. An optimal range of hidden nodes, particularly around 256, appears to balance these factors well.
 
 \subsection{Hyperparameter Tuning}
 
-We then explored how different learning rates and batch sizes affected the learning process. By systematically varying these hyperparameters, we aimed to find the optimal settings that would lead to faster convergence and better overall performance. The learning rate controls the step size during gradient descent, while the batch size determines the number of samples processed before updating the model parameters.
+We explored how batch size affects the learning process. Batch size determines the number of samples processed before updating the model parameters.
 
-\subsection{Regularization Techniques}
+As shown in Figure \ref{fig:batch_size}, increasing the batch size speeds up the training process (in terms of update steps); however, the validation loss tends to increase with larger batch sizes. Training with a lower batch size results in slower training but generally leads to better validation performance.
 
-To address overfitting, we experimented with several regularization techniques. Dropout was applied to randomly set a fraction of input units to zero at each update during training, which helps prevent the network from becoming too specialized to the training data. Additionally, layer normalization was implemented to normalize the inputs of each layer, stabilizing the learning process and improving model generalization.
+In terms of text generation metrics, a batch size of 256 achieved the highest TTR score, indicating more diverse vocabulary usage. Despite having the highest perplexity, this batch size also attained the highest BLEU score, suggesting that it generated text most similar to the reference. The BLEU score and spelling accuracy did not vary significantly with batch size.
+
+In conclusion, while larger batch sizes accelerate training, they may lead to higher validation loss. A batch size of 256 strikes a balance, achieving high diversity and similarity to the reference text.
+
+\subsection{Regularization Technique}
+
+To address overfitting, we experimented with dropout, a regularization technique that randomly sets a fraction of input units to zero at each update during training. This helps prevent the network from becoming too specialized to the training data.
+
+As shown in Figure \ref{fig: dropout}, applying dropout increases the training loss slightly but significantly reduces the validation loss and prevents it from rising too quickly.
+
+In terms of text generation metrics, higher dropout values lead to lower TTR scores, indicating reduced diversity in the generated text. However, dropout improves the percentage of correctly spelled words and slightly increases the BLEU score.
+
+Thus, it is important to find a balance in dropout. For our best model in Experiment 1 (\ref{Generation study}), we selected a dropout value of 0.3 to balance these factors effectively.
+
+
+
+\subsection{Number of layers}
+
+We investigated whether increasing network depth improves performance by training 2, 3, and 4 layer networks.
+
+In terms of validation loss, deeper networks resulted in higher validation losses, indicating increased overfitting with more layers.
+
+However, the text generation metrics present a mixed picture. Deeper networks achieved higher BLEU scores and slightly better spelling accuracy, but had lower TTR scores, indicating reduced vocabulary diversity.
+
+While adding regularization techniques might improve the performance of deeper networks, this is beyond the scope of this study.
+
+
+% \subsection{Regularization Techniques}
+% Additionally, layer normalization was implemented to normalize the inputs of each layer, stabilizing the learning process and improving model generalization.
 
 \subsection{Data Augmentation}
 
 Finally, we explored data augmentation methods to increase the diversity of our training data. This involved generating additional training samples by applying various transformations to the original data, which aimed to improve the model's robustness and its ability to generalize to unseen data.
 
-Each of these experiments provided valuable insights into the factors influencing the performance of our text generation models. The results guided us in selecting the best model configuration and training strategies for optimal text generation.
+We tried to use data augmentation on different model from a simple RNN model, we can understand that it increase the loss from 5.66 to 5.87. But when we analyse the synthesized text qualitatively, a few things have changed:
+\begin{itemize}
+    \item the model is able to create correct sentences
+    \item the model is less repetitive 
+    \item the model is less representative of the book
+\end{itemize}
+We will also next implement it on all our best models. 
+We can understand that in every case the loss is higher, as we augment the dataset we are using words that have the same meaning (roughly) but that would not be used by the author so it makes the result more accurate in general but less accurate when we think about writing as the author of the dataset.
+
+To have better results using data augmentation it could be interesting to implement contextualized word embedding [3].
 
 
-
-
-\textbf{TODO}
 
 \section{Results}
 
@@ -202,6 +258,11 @@ mem doingn it thise you, thing I rig
  er ma, as wast ulilled nchilled headved Iled Alring!' A
 \end{verbatim}
 
+and at the very end, one of our best model output that:
+\begin{verbatim}
+    
+\end{verbatim}
+
 \textbf{TO COMPLETE}
 
 \section{Conclusion}
@@ -209,6 +270,50 @@ mem doingn it thise you, thing I rig
 \textbf{TODO}
 
 \newpage
+
+\section*{References}
+
+
+Here you can find the following sources that we use for this project and this report.
+\medskip
+
+
+{
+\small
+
+
+[1] https://neptune.ai/blog/data-augmentation-nlp 
+(eds.), {\it Data Augmentation in NLP: Best Practices From a Kaggle Master}, 1st September 2023
+
+
+
+[2] https://towardsdatascience.com/data-augmentation-in-nlp-2801a34dfc28 {\it Data Augmentation in NLP},  12th April 2019
+
+
+[3] https://ai.stanford.edu/blog/contextual/ {\it BERT, ELMo, & GPT-2: How Contextual are Contextualized Word Representations?},  24th March 2020
+}
+
+\newpage
+
+
+\section{Appendix A: Data augmentation example and graphs}
+
+Here is a short example of the substitution that have been made to augment the dataset.
+Example 1 of substitution:
+\begin{itemize}
+    \item Original: for the hot day made her feel very sleepy and stupid
+    \item Reformulated once: for the hot the made her feel not sleepy years stupid
+    \item Reformulated twice: for when top day made her feel very sleepy and dumb
+\end{itemize}
+Example 2 of substitution:
+\begin{itemize}
+    \item Original: and looked at it 
+    \item Reformulated once: and looked at being 
+    \item Reformulated twice: more looked at it 
+\end{itemize}
+
+\newpage
+
 
 \section{Submission of papers to NeurIPS 2023}
 
@@ -563,41 +668,9 @@ Do {\bf not} include this section in the anonymized submission, only in the fina
 
 
 
-\section{Supplementary Material}
-
-Authors may wish to optionally include extra information (complete proofs, additional experiments and plots) in the appendix. All such materials should be part of the supplemental material (submitted separately) and should NOT be included in the main submission.
 
 
-\section*{References}
 
-
-References follow the acknowledgments in the camera-ready paper. Use unnumbered first-level heading for
-the references. Any choice of citation style is acceptable as long as you are
-consistent. It is permissible to reduce the font size to \verb+small+ (9 point)
-when listing the references.
-Note that the Reference section does not count towards the page limit.
-\medskip
-
-
-{
-\small
-
-
-[1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms for
-connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and T.K.\ Leen
-(eds.), {\it Advances in Neural Information Processing Systems 7},
-pp.\ 609--616. Cambridge, MA: MIT Press.
-
-
-[2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS: Exploring
-  Realistic Neural Models with the GEneral NEural SImulation System.}  New York:
-TELOS/Springer--Verlag.
-
-
-[3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of learning and
-recall at excitatory recurrent synapses and cholinergic modulation in rat
-hippocampal region CA3. {\it Journal of Neuroscience} {\bf 15}(7):5249-5262.
-}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
